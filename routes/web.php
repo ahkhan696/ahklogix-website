@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PortfolioController;
@@ -32,5 +33,6 @@ Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 Route::get('/about', AboutController::class)->name('about');
 Route::get('/faq',   FaqController::class)->name('faq');
 
-// Contact — Phase 7
-Route::get('/contact', fn () => view('pages.placeholder', ['section' => 'Contact']))->name('contact');
+// Contact
+Route::get('/contact',  [ContactController::class, 'show'])->name('contact');
+Route::post('/contact', [ContactController::class, 'submit'])->middleware('throttle:5,1')->name('contact.submit');

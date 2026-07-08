@@ -27,7 +27,7 @@ class ManageSettings extends Page implements HasForms
 
     public function mount(): void
     {
-        $keys = ['whatsapp_number', 'booking_url', 'contact_email', 'chatbot_embed', 'linkedin_url', 'twitter_url', 'github_url'];
+        $keys = ['whatsapp_number', 'booking_url', 'contact_email', 'chatbot_embed', 'linkedin_url', 'twitter_url', 'github_url', 'ghl_webhook_url'];
         $values = Setting::whereIn('key', $keys)->pluck('value', 'key')->toArray();
 
         $this->form->fill($values);
@@ -56,6 +56,14 @@ class ManageSettings extends Page implements HasForms
                     TextInput::make('twitter_url')->label('Twitter / X')->url()->placeholder('https://x.com/ahklogix'),
                     TextInput::make('github_url')->label('GitHub')->url()->placeholder('https://github.com/ahklogix'),
                 ])->columns(3),
+
+                Section::make('Integrations')->schema([
+                    TextInput::make('ghl_webhook_url')
+                        ->label('GoHighLevel webhook URL')
+                        ->url()
+                        ->placeholder('https://services.leadconnectorhq.com/hooks/...')
+                        ->helperText('Contact form submissions will be POSTed here. Leave empty to disable.'),
+                ])->columns(1),
 
                 Section::make('AI Chatbot')->schema([
                     Textarea::make('chatbot_embed')
