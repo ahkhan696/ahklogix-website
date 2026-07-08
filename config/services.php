@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+    // ── AHKLOGIX site-wide settings ──────────────────────────────────────────
+    // These fall back to .env values. Phase 3 replaces them with the Settings
+    // table so the owner can update them from the Filament admin panel.
+    'whatsapp_number' => env('WHATSAPP_NUMBER', ''),
+    'booking_url'     => env('BOOKING_URL', '#'),
+    'contact_email'   => env('CONTACT_EMAIL', 'hello@ahklogix.com'),
+    'chatbot_embed'   => env('CHATBOT_EMBED_CODE', null),
+
 ];

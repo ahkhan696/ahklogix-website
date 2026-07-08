@@ -6,13 +6,12 @@
 @source "../**/*.blade.php";
 @source "../**/*.js";
 
+/* ─── Brand tokens ─────────────────────────────────────────────────────────── */
 @theme {
-    /* Fonts */
     --font-heading: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
-    --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
-    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-body:    'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-sans:    'Inter', ui-sans-serif, system-ui, sans-serif;
 
-    /* Brand colors */
     --color-indigo-ink:  #1E1B4B;
     --color-indigo-deep: #2D1B69;
     --color-violet:      #7C3AED;
@@ -24,16 +23,74 @@
     --color-text-body:   #44425A;
     --color-text-muted:  #787690;
 
-    /* Brand gradient — use as bg-[var(--gradient-brand)] or inline style */
     --gradient-brand: linear-gradient(135deg, #EC1FC4 0%, #7C3AED 50%, #2E8BE6 100%);
 }
 
-/* Reduce-motion kill switch — covers every animation in one place */
+/* ─── Typography base ───────────────────────────────────────────────────────── */
+@layer base {
+    h1, h2, h3, h4, h5, h6 {
+        font-family: var(--font-heading);
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+    }
+
+    body {
+        font-family: var(--font-body);
+        font-size: 1rem;
+        line-height: 1.7;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* Focus ring for keyboard nav — consistent across interactive elements */
+    :focus-visible {
+        outline: 2px solid var(--color-violet);
+        outline-offset: 3px;
+        border-radius: 4px;
+    }
+}
+
+/* ─── Gradient button ───────────────────────────────────────────────────────── */
+/* §8 item 8: gradient shifts brightness on hover, arrow icon translates */
+.btn-gradient {
+    background: var(--gradient-brand);
+    transition: filter 200ms ease-out, transform 100ms ease-out;
+}
+.btn-gradient:hover  { filter: brightness(1.08); }
+.btn-gradient:active { transform: scale(0.99); }
+
+/* ─── Scroll reveal (§8 item 4) ─────────────────────────────────────────────── */
+/* Alpine x-intersect.once adds .is-visible when element enters viewport */
+.reveal-wrap {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 400ms ease-out, transform 400ms ease-out;
+}
+.reveal-wrap.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ─── Chatbot bubble pulse (§8 item 10) ─────────────────────────────────────── */
+/* Fires every 8s — subtle attention without annoyance */
+@keyframes bubble-pulse {
+    0%, 85%, 100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0); }
+    90%            { box-shadow: 0 0 0 8px rgba(124, 58, 237, 0.25); }
+}
+.bubble-pulse {
+    animation: bubble-pulse 8s ease-out infinite;
+}
+
+/* ─── Reduced-motion kill switch ─────────────────────────────────────────────── */
+/* Covers every animation sitewide — single place to maintain */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
+        animation-duration:       0.01ms !important;
+        animation-iteration-count: 1     !important;
+        transition-duration:      0.01ms !important;
+        scroll-behavior:          auto   !important;
+    }
+    .reveal-wrap {
+        opacity: 1;
+        transform: none;
     }
 }
