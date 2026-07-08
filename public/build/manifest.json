@@ -1,0 +1,22 @@
+{
+  "resources/css/app.css": {
+    "file": "assets/app-BxN5gK4J.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-2Bc4NkjV.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "dynamicImports": [
+      "resources/js/canvas-network.js"
+    ]
+  },
+  "resources/js/canvas-network.js": {
+    "file": "assets/canvas-network-B3Zq2SZk.js",
+    "name": "canvas-network",
+    "src": "resources/js/canvas-network.js",
+    "isDynamicEntry": true
+  }
+}
