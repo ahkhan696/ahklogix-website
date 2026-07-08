@@ -17,10 +17,19 @@ class DatabaseSeeder extends Seeder
         User::firstOrCreate(
             ['email' => 'admin@ahklogix.com'],
             [
-                'name'     => 'AHKLOGIX Admin',
-                'password' => bcrypt('password'),
+                'name'              => 'AHKLOGIX Admin',
+                'password'          => bcrypt('password'),
                 'email_verified_at' => now(),
             ]
         );
+
+        $this->call([
+            ServicesSeeder::class,
+            ProjectsSeeder::class,
+            ReviewsSeeder::class,
+            FaqsSeeder::class,
+            PostsSeeder::class,
+            SettingsSeeder::class,
+        ]);
     }
 }

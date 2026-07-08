@@ -14,7 +14,7 @@
 
         {{-- Logo --}}
         <a href="{{ route('home') }}" class="flex-shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet rounded-lg" aria-label="{{ config('app.name') }} home">
-            <img src="{{ asset('images/logo.svg') }}" alt="{{ config('app.name') }}" class="h-8 w-auto">
+            <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name') }}" class="h-10 w-auto" width="228" height="100">
         </a>
 
         {{-- Desktop nav --}}

@@ -12,12 +12,12 @@
             {{-- Brand column --}}
             <div class="lg:col-span-1">
                 <a href="{{ route('home') }}" aria-label="{{ config('app.name') }} home">
-                    {{-- White version via CSS filter on the mono logo --}}
-                    {{-- TODO: swap for a dedicated white logo file when available --}}
+                    {{-- logo_black.png is monochrome; invert() makes it white on the dark footer --}}
                     <img
-                        src="{{ asset('images/logo.svg') }}"
+                        src="{{ asset('images/logo_black.png') }}"
                         alt="{{ config('app.name') }}"
-                        class="h-8 w-auto brightness-0 invert"
+                        class="h-10 w-auto invert"
+                        width="228" height="100"
                     >
                 </a>
                 <p class="mt-5 text-sm leading-relaxed text-white/60 max-w-xs">
