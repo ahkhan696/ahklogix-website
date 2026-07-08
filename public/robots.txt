@@ -1,2 +1,5 @@
 User-agent: *
-Disallow:
+Disallow: /admin
+Disallow: /admin/
+
+Sitemap: https://ahklogix.com/sitemap.xml

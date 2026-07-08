@@ -8,6 +8,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\PosrController;
 use App\Http\Controllers\ServicesController;
+use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 
 // ── Public routes ─────────────────────────────────────────────────────────────
@@ -36,3 +37,6 @@ Route::get('/faq',   FaqController::class)->name('faq');
 // Contact
 Route::get('/contact',  [ContactController::class, 'show'])->name('contact');
 Route::post('/contact', [ContactController::class, 'submit'])->middleware('throttle:5,1')->name('contact.submit');
+
+// Sitemap
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');

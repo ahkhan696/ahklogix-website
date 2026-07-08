@@ -1,6 +1,9 @@
 <x-layouts.app
     title="POSR — Point of Sale for Restaurants"
     description="POSR is a purpose-built POS system for restaurants — order management, table tracking, kitchen display, and real-time reporting, all in one.">
+<x-slot:head>
+@include('partials.jsonld.product')
+</x-slot:head>
 
 {{-- ── Hero ─────────────────────────────────────────────────────────────────── --}}
 <section class="pt-16 pb-24 bg-bg border-b border-border overflow-hidden">

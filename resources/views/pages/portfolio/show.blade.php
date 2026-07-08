@@ -1,6 +1,10 @@
+@php
+    $projectOgImage = $project->getFirstMediaUrl('cover', 'full') ?: $project->getFirstMediaUrl('cover') ?: null;
+@endphp
 <x-layouts.app
     :title="($project->seo_title ?: $project->title) . ' — Case Study'"
-    :description="$project->seo_description ?: $project->problem">
+    :description="$project->seo_description ?: $project->problem"
+    :ogImage="$projectOgImage">
 
 {{-- ── Hero / header ───────────────────────────────────────────────────────── --}}
 <section class="pt-16 pb-0 bg-bg">

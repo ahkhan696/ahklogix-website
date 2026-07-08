@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Project extends Model implements HasMedia
 {
@@ -33,11 +35,33 @@ class Project extends Model implements HasMedia
                 $model->slug = Str::slug($model->title);
             }
         });
+
+        static::saved(fn () => Cache::flush());
+        static::deleted(fn () => Cache::flush());
     }
 
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('cover')->singleFile();
         $this->addMediaCollection('gallery');
+    }
+
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this->addMediaConversion('full')
+            ->performOnCollections('cover', 'gallery')
+            ->width(1200)
+            ->height(630)
+            ->sharpen(5)
+            ->format('webp')
+            ->nonQueued();
+
+        $this->addMediaConversion('thumb')
+            ->performOnCollections('cover', 'gallery')
+            ->width(800)
+            ->height(500)
+            ->sharpen(5)
+            ->format('webp')
+            ->nonQueued();
     }
 }

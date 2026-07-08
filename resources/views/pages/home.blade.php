@@ -1,4 +1,7 @@
 <x-layouts.app title="Software Engineering Studio — Custom Web Apps, Automation & AI">
+<x-slot:head>
+@include('partials.jsonld.organization')
+</x-slot:head>
 
 {{-- ════════════════════════════════════════════════════════════════
      §2.2  HERO

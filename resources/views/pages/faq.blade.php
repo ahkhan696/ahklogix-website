@@ -1,6 +1,11 @@
 <x-layouts.app
     title="FAQ — Frequently Asked Questions"
     description="Answers to the most common questions about working with AHKLOGIX — process, timelines, pricing, technologies, and how we approach projects.">
+<x-slot:head>
+@if($grouped->isNotEmpty())
+@include('partials.jsonld.faq-page')
+@endif
+</x-slot:head>
 
 {{-- ── Hero ─────────────────────────────────────────────────────────────────── --}}
 <section class="pt-16 pb-20 bg-bg border-b border-border">

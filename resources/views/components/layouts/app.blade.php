@@ -16,6 +16,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    {{-- Font preconnect (Bunny Fonts CDN) --}}
+    <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
+    <link rel="dns-prefetch" href="https://fonts.bunny.net">
+
     <title>{{ $pageTitle }}</title>
     <meta name="description" content="{{ $description }}">
     <link rel="canonical" href="{{ $canonicalUrl }}">

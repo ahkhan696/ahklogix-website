@@ -1,6 +1,13 @@
+@php
+    $postOgImage = $post->getFirstMediaUrl('cover', 'blog-hero') ?: $post->getFirstMediaUrl('cover') ?: null;
+@endphp
 <x-layouts.app
     :title="$post->seo_title ?: $post->title . ' — AHKLOGIX Blog'"
-    :description="$post->seo_description ?: $post->excerpt">
+    :description="$post->seo_description ?: $post->excerpt"
+    :ogImage="$postOgImage">
+<x-slot:head>
+@include('partials.jsonld.blog-posting')
+</x-slot:head>
 
 {{-- ── Breadcrumb + post header ────────────────────────────────────────────── --}}
 <section class="pt-16 pb-12 bg-bg border-b border-border">

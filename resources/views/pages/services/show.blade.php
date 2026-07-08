@@ -1,6 +1,13 @@
+@php
+    $serviceOgImage = $service->getFirstMediaUrl('icon_image', 'hero') ?: $service->getFirstMediaUrl('icon_image') ?: null;
+@endphp
 <x-layouts.app
     :title="$service->seo_title ?: $service->title . ' — AHKLOGIX'"
-    :description="$service->seo_description ?: $service->short_description">
+    :description="$service->seo_description ?: $service->short_description"
+    :ogImage="$serviceOgImage">
+<x-slot:head>
+@include('partials.jsonld.service')
+</x-slot:head>
 
 {{-- ── Breadcrumb + hero ───────────────────────────────────────────────────── --}}
 <section class="pt-16 pb-20 bg-bg border-b border-border">
