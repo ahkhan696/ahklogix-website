@@ -80,6 +80,44 @@
     animation: bubble-pulse 8s ease-out infinite;
 }
 
+/* ─── Hero entrance stagger (§8.2) ──────────────────────────────────────────── */
+@keyframes heroFadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.hero-enter {
+    animation: heroFadeUp 500ms ease-out both;
+    /* default delay 0ms — override per element */
+}
+.hero-enter-1 { animation-delay:   0ms; }
+.hero-enter-2 { animation-delay:  90ms; }
+.hero-enter-3 { animation-delay: 180ms; }
+.hero-enter-4 { animation-delay: 270ms; }
+
+/* ─── Card hover lift (§8.6) ────────────────────────────────────────────────── */
+.card-hover {
+    transition: transform 200ms ease-out, box-shadow 200ms ease-out;
+}
+.card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 44px -12px rgba(124, 58, 237, 0.18);
+}
+
+/* ─── Process timeline draw (§8.7) ─────────────────────────────────────────── */
+.timeline-line {
+    transform-origin: left;
+    transform: scaleX(0);
+    transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.timeline-line.is-drawn {
+    transform: scaleX(1);
+}
+@keyframes dotPop {
+    from { transform: scale(0); opacity: 0; }
+    50%  { transform: scale(1.15); }
+    to   { transform: scale(1); opacity: 1; }
+}
+
 /* ─── Reduced-motion kill switch ─────────────────────────────────────────────── */
 /* Covers every animation sitewide — single place to maintain */
 @media (prefers-reduced-motion: reduce) {

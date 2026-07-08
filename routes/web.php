@@ -1,12 +1,11 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
-// ── Public routes ────────────────────────────────────────────────────────────
-// Controllers will be added in Phase 3 & 4. Stubs here so named routes work
-// across all components (header nav, footer, etc.) without runtime errors.
+// ── Public routes ─────────────────────────────────────────────────────────────
 
-Route::get('/', fn () => view('pages.home'))->name('home');
+Route::get('/', HomeController::class)->name('home');
 
 // Services — Phase 3 adds ServiceController
 Route::get('/services',        fn () => view('pages.placeholder', ['section' => 'Services']))->name('services.index');
