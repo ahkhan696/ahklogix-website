@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AboutController;
+use App\Http\Controllers\BlogController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PortfolioController;
@@ -23,9 +24,9 @@ Route::get('/portfolio/{slug}', [PortfolioController::class, 'show'])->name('por
 // POSR
 Route::get('/posr', PosrController::class)->name('posr');
 
-// Blog — Phase 6
-Route::get('/blog',        fn () => view('pages.placeholder', ['section' => 'Blog']))->name('blog.index');
-Route::get('/blog/{slug}', fn () => view('pages.placeholder', ['section' => 'Blog Post']))->name('blog.show');
+// Blog
+Route::get('/blog',        [BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
 // About + FAQ
 Route::get('/about', AboutController::class)->name('about');
