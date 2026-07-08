@@ -51,6 +51,13 @@
 </head>
 <body class="bg-bg text-text-body antialiased">
 
+    {{-- Skip-to-main-content — visible only on keyboard focus --}}
+    <a
+        href="#main-content"
+        class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[200] focus:px-4 focus:py-2 focus:rounded-lg focus:text-sm focus:font-semibold focus:text-white focus:shadow-lg focus:outline-none"
+        style="background: var(--gradient-brand)"
+    >Skip to main content</a>
+
     <x-header />
 
     <main id="main-content">

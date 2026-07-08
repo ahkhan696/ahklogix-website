@@ -31,6 +31,7 @@
 {{-- ── Services grid ───────────────────────────────────────────────────────── --}}
 <section class="py-24 bg-bg">
     <x-container>
+        @if($services->isNotEmpty())
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach($services as $service)
             <x-reveal :delay="$loop->index % 3 * 80">
@@ -60,6 +61,16 @@
             </x-reveal>
             @endforeach
         </div>
+        @else
+        <div class="py-24 flex flex-col items-center text-center gap-5">
+            <div class="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0" style="background: var(--gradient-brand)">
+                <x-svg-icon name="code-bracket" class="w-8 h-8 text-white" />
+            </div>
+            <h2 class="font-heading font-semibold text-xl text-indigo-ink">Services coming soon</h2>
+            <p class="text-text-muted text-sm max-w-xs leading-relaxed">Our service pages are being added. In the meantime, get in touch to discuss your project.</p>
+            <x-button-primary href="{{ route('contact') }}">Start a conversation</x-button-primary>
+        </div>
+        @endif
     </x-container>
 </section>
 

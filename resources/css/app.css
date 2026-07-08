@@ -118,6 +118,26 @@
     to   { transform: scale(1); opacity: 1; }
 }
 
+/* ─── Alpine x-cloak — hide before JS initialises to prevent FOUC ───────────── */
+[x-cloak] { display: none !important; }
+
+/* ─── No-JS fallback — reveal-wrap stays visible if scripting is disabled ─────── */
+@media (scripting: none) {
+    .reveal-wrap { opacity: 1; transform: none; }
+}
+
+/* ─── Tech marquee (§8.11) ──────────────────────────────────────────────────── */
+@keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+}
+.marquee-track {
+    animation: marquee 28s linear infinite;
+}
+.marquee-wrap:hover .marquee-track {
+    animation-play-state: paused;
+}
+
 /* ─── Reduced-motion kill switch ─────────────────────────────────────────────── */
 /* Covers every animation sitewide — single place to maintain */
 @media (prefers-reduced-motion: reduce) {
@@ -130,5 +150,8 @@
     .reveal-wrap {
         opacity: 1;
         transform: none;
+    }
+    .marquee-track {
+        animation: none;
     }
 }

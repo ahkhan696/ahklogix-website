@@ -81,6 +81,7 @@
         @endif
 
         {{-- Project grid --}}
+        @if($projects->isNotEmpty())
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach($projects as $project)
             <div
@@ -153,6 +154,16 @@
             </div>
             @endforeach
         </div>
+        @else
+        <div class="py-24 flex flex-col items-center text-center gap-5">
+            <div class="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0" style="background: var(--gradient-brand)">
+                <x-svg-icon name="rectangle-stack" class="w-8 h-8 text-white" />
+            </div>
+            <h2 class="font-heading font-semibold text-xl text-indigo-ink">Projects coming soon</h2>
+            <p class="text-text-muted text-sm max-w-xs leading-relaxed">We're adding case studies here. Reach out to see our full portfolio in the meantime.</p>
+            <x-button-primary href="{{ route('contact') }}">Get in touch</x-button-primary>
+        </div>
+        @endif
 
     </x-container>
 </section>

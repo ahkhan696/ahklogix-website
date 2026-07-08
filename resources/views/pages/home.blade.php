@@ -37,7 +37,7 @@
                         x-init="setInterval(() => {
                             flipping = true;
                             setTimeout(() => { i = (i + 1) % words.length; flipping = false; }, 240);
-                        }, 3200)"
+                        }, 2500)"
                         class="inline-block"
                     >
                         <span
@@ -170,6 +170,25 @@
     </x-container>
 </section>
 
+{{-- ════════════════════════════════════════════════════════════════
+     §2.3b  TECH MARQUEE  — scrolling tech stack strip (decorative)
+     ════════════════════════════════════════════════════════════════ --}}
+@php
+$_techItems = ['Laravel', 'PHP', 'Zoho CRM', 'GoHighLevel', 'Make.com', 'Stripe', 'OpenAI', 'React Native', 'WordPress', 'Tailwind CSS', 'REST APIs', 'MySQL', 'Filament'];
+@endphp
+<section class="py-5 bg-surface border-b border-border overflow-hidden" aria-hidden="true">
+    <div class="marquee-wrap relative">
+        <div class="marquee-track flex items-center whitespace-nowrap will-change-transform">
+            @foreach(array_merge($_techItems, $_techItems) as $_tech)
+            <span class="inline-flex items-center gap-4 px-5 text-xs font-semibold uppercase tracking-widest text-text-muted">
+                {{ $_tech }}
+                <span class="w-1 h-1 rounded-full bg-border" aria-hidden="true"></span>
+            </span>
+            @endforeach
+        </div>
+    </div>
+</section>
+
 
 {{-- ════════════════════════════════════════════════════════════════
      §2.4  SERVICES GRID  — from DB (§8.6 card hover)
@@ -184,6 +203,7 @@
             </div>
         </x-reveal>
 
+        @if($services->isNotEmpty())
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             @foreach($services as $service)
             <x-reveal :delay="$loop->index % 4 * 70">
@@ -213,6 +233,9 @@
             </x-reveal>
             @endforeach
         </div>
+        @else
+        <div class="py-12 text-center text-text-muted text-sm">No services have been added yet.</div>
+        @endif
 
         <x-reveal>
             <div class="mt-12 text-center">
@@ -239,6 +262,7 @@
             </div>
         </x-reveal>
 
+        @if($projects->isNotEmpty())
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach($projects as $project)
             <x-reveal :delay="$loop->index % 3 * 80">
@@ -296,6 +320,9 @@
             </x-reveal>
             @endforeach
         </div>
+        @else
+        <div class="py-12 text-center text-text-muted text-sm">No projects have been added yet.</div>
+        @endif
     </x-container>
 </section>
 
@@ -554,6 +581,7 @@ $steps = [
             </div>
         </x-reveal>
 
+        @if($reviews->isNotEmpty())
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-5">
             @foreach($reviews as $review)
             <x-reveal :delay="$loop->index % 4 * 80">
@@ -600,6 +628,7 @@ $steps = [
             </x-reveal>
             @endforeach
         </div>
+        @endif
     </x-container>
 </section>
 
@@ -617,6 +646,7 @@ $steps = [
                     <p class="mt-4 text-text-muted leading-relaxed">Quick answers to what most clients ask before starting.</p>
                 </div>
 
+                @if($faqs->isNotEmpty())
                 <div class="space-y-3" role="list">
                     @foreach($faqs as $faq)
                     <div
@@ -656,6 +686,7 @@ $steps = [
                     </div>
                     @endforeach
                 </div>
+                @endif
 
                 <div class="mt-8 text-center">
                     <x-button-secondary href="{{ route('faq') }}">View all FAQs</x-button-secondary>
