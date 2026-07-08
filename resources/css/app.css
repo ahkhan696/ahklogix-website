@@ -1,0 +1,39 @@
+@import url('https://fonts.bunny.net/css?family=space-grotesk:500,600,700|inter:400,500&display=swap');
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source "../**/*.blade.php";
+@source "../**/*.js";
+
+@theme {
+    /* Fonts */
+    --font-heading: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+    /* Brand colors */
+    --color-indigo-ink:  #1E1B4B;
+    --color-indigo-deep: #2D1B69;
+    --color-violet:      #7C3AED;
+    --color-magenta:     #EC1FC4;
+    --color-blue-brand:  #2E8BE6;
+    --color-bg:          #FFFFFF;
+    --color-surface:     #F7F7FB;
+    --color-border:      #E7E7F0;
+    --color-text-body:   #44425A;
+    --color-text-muted:  #787690;
+
+    /* Brand gradient — use as bg-[var(--gradient-brand)] or inline style */
+    --gradient-brand: linear-gradient(135deg, #EC1FC4 0%, #7C3AED 50%, #2E8BE6 100%);
+}
+
+/* Reduce-motion kill switch — covers every animation in one place */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
