@@ -35,6 +35,12 @@ return [
         ],
     ],
 
+    // ── Anthropic / Claude API ────────────────────────────────────────────────
+    'anthropic' => [
+        'key'   => env('ANTHROPIC_API_KEY'),
+        'model' => env('ANTHROPIC_CHAT_MODEL', 'claude-haiku-4-5-20251001'),
+    ],
+
     // ── AHKLOGIX site-wide settings ──────────────────────────────────────────
     // These fall back to .env values. Phase 3 replaces them with the Settings
     // table so the owner can update them from the Filament admin panel.
