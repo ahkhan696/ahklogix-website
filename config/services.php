@@ -35,10 +35,15 @@ return [
         ],
     ],
 
-    // ── Anthropic / Claude API ────────────────────────────────────────────────
+    // ── AI chat drivers ───────────────────────────────────────────────────────
     'anthropic' => [
         'key'   => env('ANTHROPIC_API_KEY'),
         'model' => env('ANTHROPIC_CHAT_MODEL', 'claude-haiku-4-5-20251001'),
+    ],
+
+    'gemini' => [
+        'key'   => env('GEMINI_API_KEY'),
+        'model' => env('GEMINI_CHAT_MODEL', 'gemini-flash-latest'),
     ],
 
     // ── AHKLOGIX site-wide settings ──────────────────────────────────────────
