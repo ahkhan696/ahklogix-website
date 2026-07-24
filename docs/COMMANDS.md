@@ -111,26 +111,48 @@ Commit (after live verification): `Phase D2: production deploy config`
 
 ## Chatbot phases (docs/ROADMAP.md) — after the site is live
 
-**Phase C1 — Chat API route**
-> Read docs/ROADMAP.md. Do Phase C1 only (chat API route: Claude API integration with
-> SSE streaming, system prompt assembled from database content with caching, and rate
-> limiting — test via curl). Plan first, wait for my approval, then stop.
+Budget note: C1 was built Claude-only and Claude API needs prepaid credit. The plan now
+is provider-agnostic — run on Google Gemini's **free tier** (or fully free rule-based)
+and switch to a paid model later with one env variable. See ROADMAP.md §2.0.
 
-Commit: `Phase C1: chatbot API route`
+**Phase C0 — Refactor to provider drivers** (replaces/extends the existing C1)
+> Read docs/ROADMAP.md §2. Do Phase C0 only (refactor to drivers: extract the existing
+> Claude-only chat API call behind a ChatDriver contract, add CHAT_DRIVER env switching,
+> implement GeminiDriver for Google's free tier, and keep ClaudeDriver working). Test
+> both via curl. Plan first, wait for my approval, then stop.
+
+Commit: `Phase C0: provider-agnostic chat drivers`
+(Before sending: get a free Gemini API key from Google AI Studio — no credit card needed.)
+
+**Phase C0b — Rule-based fallback driver**
+> Read docs/ROADMAP.md §2. Do Phase C0b only (RuleBasedDriver: answer from the faqs and
+> services tables using keyword/full-text matching with WhatsApp handoff when there's no
+> match, and wire it as the automatic fallback whenever the active driver errors, returns
+> 429, or has no API key configured). Test by unsetting the API key. Plan first, wait for
+> my approval, then stop.
+
+Commit: `Phase C0b: rule-based fallback driver`
 
 **Phase C2 — Chat UI**
-> Read docs/ROADMAP.md. Do Phase C2 only (chat UI: upgrade the chatbot bubble into a
+> Read docs/ROADMAP.md §2. Do Phase C2 only (chat UI: upgrade the chatbot bubble into a
 > full streaming chat panel with brand styling, open/close, message list, and
-> mobile-friendly layout). Plan first, wait for my approval, then stop.
+> mobile-friendly layout — it must work identically on any driver). Plan first, wait for
+> my approval, then stop.
 
 Commit: `Phase C2: chatbot UI`
 
 **Phase C3 — Handoff + logging**
-> Read docs/ROADMAP.md. Do Phase C3 only (handoff + logging: intent-based handoff to
-> WhatsApp/booking/contact, chat_sessions table with a Filament resource, and logging
-> disclosure in the widget). Plan first, wait for my approval, then stop.
+> Read docs/ROADMAP.md §2. Do Phase C3 only (handoff + logging: intent-based handoff to
+> WhatsApp/booking/contact, chat_sessions table with a Filament resource, quota/error
+> visibility in admin, per-IP rate limiting plus a CHAT_DAILY_LIMIT ceiling to protect the
+> free quota, and logging disclosure in the widget). Plan first, wait for my approval,
+> then stop.
 
 Commit: `Phase C3: chatbot handoff + logging`
+
+**Switching provider later (no phase needed)**
+> Change CHAT_DRIVER in .env to `claude` (or `openai`) and make sure the matching API key
+> is set. Confirm the chat route works, then clear config cache.
 
 ---
 

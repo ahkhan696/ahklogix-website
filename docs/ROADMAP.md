@@ -16,7 +16,7 @@ the Node stack, because the whole SaaS layer is first-party Laravel:**
 | Customer accounts (separate from admin) | Laravel auth (Breeze/Fortify) on a `customers` guard/table |
 | Subscriptions & payments | **Laravel Cashier (Stripe)** — official package: checkout, webhooks, billing portal, `subscribed()` checks |
 | Paid-feature gating | Middleware + policy checks (`$user->subscribed('pro')`) |
-| AI chatbot | Anthropic Claude API via Laravel HTTP client; SSE streaming route; Alpine chat UI |
+| AI chatbot | Provider-agnostic driver (Gemini free tier / Claude / OpenAI / rule-based) via Laravel HTTP client; SSE streaming route; Alpine chat UI |
 
 Nothing in the main site changes; these layer on top.
 
@@ -28,27 +28,64 @@ Nothing in the main site changes; these layer on top.
 pricing, and POSR — doubling as a sales demo, since AI chatbots are a service the studio
 sells. "Talk to the same bot we'll build for you."
 
-**Architecture:**
-- Backend: `POST /api/chat` route calling the **Claude API** (Messages API, streaming via
-  SSE). API key server-side in `.env` (`ANTHROPIC_API_KEY`) — never exposed to the browser.
-- Knowledge: system prompt assembled from DB content (services, FAQs, POSR features,
-  process, contact options) so answers stay current with admin edits. Cache the compiled
-  prompt; bust on model save. Prompt-stuffing is enough at this content size.
-- Frontend: upgrade the chatbot bubble into a chat panel (Alpine + streamed fetch):
-  open/close, message list, streaming text, mobile-friendly.
-- Behaviors: answer from studio knowledge; on hire/quote intent, hand off to WhatsApp /
-  booking / contact form. Log conversations to a `chat_sessions` table (+ Filament
-  resource) for lead insight — disclose logging in the widget.
-- Guardrails: scope to studio topics; rate-limit the route (Laravel RateLimiter); cap
-  message length; graceful fallback on API errors.
+### 2.0 Budget decision (IMPORTANT — read before building)
 
-**Phases:**
-- **C1 — Chat API route:** Claude API integration, streaming, system prompt from DB,
-  rate limiting. Test via curl. STOP.
-- **C2 — Chat UI:** bubble → full streaming chat panel, brand styling. STOP.
-- **C3 — Handoff + logging:** intent handoff, `chat_sessions` + Filament resource. STOP.
+LLM APIs are pay-as-you-go; there is no free ride via consumer subscriptions.
+**ChatGPT Plus does NOT include API access** — the OpenAI API is billed separately.
+Same for Claude Pro. So the chatbot must run on one of these:
 
----
+| Mode | Cost | Notes |
+|---|---|---|
+| **A. Free-tier LLM (default for now)** | free | Google Gemini free tier (Flash / Flash-Lite). No credit card, no expiry, commercial use allowed. Rate-limited per day; Google may use free-tier data for training; limits change without notice — verify live figures in Google AI Studio. |
+| **B. Paid LLM (best quality/reliability)** | small prepaid credit | Claude (Haiku-class) or OpenAI. Cheap per-conversation for a marketing site; no rate-limit anxiety, no training on your data. Switch to this when budget allows. |
+| **C. Zero-API fallback** | free, forever | Rule-based FAQ bot: keyword/full-text match against the `faqs` + `services` tables, canned answers, handoff to WhatsApp when no match. No LLM at all. |
+
+**Decision: build provider-agnostic, run on Mode A (Gemini free tier) now, with Mode C
+as the automatic fallback when quota/API fails. Switching to Mode B later must be an
+env-variable change, not a rewrite.**
+
+### 2.1 Architecture (provider-agnostic)
+
+- **Driver interface:** `ChatDriver` contract with `stream(array $messages, string $system)`.
+  Implementations: `GeminiDriver`, `ClaudeDriver`, `OpenAiDriver`, `RuleBasedDriver`.
+  Selected via `CHAT_DRIVER` in `.env` (`gemini` | `claude` | `openai` | `rules`).
+  Bound in a service provider; the rest of the app never references a vendor directly.
+  (Optionally evaluate a Laravel multi-LLM package such as Prism instead of hand-rolling —
+  only if it doesn't add heavy dependencies.)
+- **Backend:** `POST /api/chat` route → selected driver. Keys server-side in `.env`
+  (`GEMINI_API_KEY` / `ANTHROPIC_API_KEY` / `OPENAI_API_KEY`) — never exposed to the browser.
+- **Graceful degradation:** if the active driver errors, is rate-limited (429), or has no
+  key configured, automatically fall back to `RuleBasedDriver` so the widget never appears
+  broken to a prospect. Log the failure for the admin.
+- **Knowledge:** system prompt assembled from DB content (services, FAQs, POSR features,
+  process, contact options), cached and busted on model save. Prompt-stuffing is enough at
+  this content size.
+- **Frontend:** chatbot bubble → chat panel (Alpine + streamed fetch): open/close, message
+  list, streaming text, mobile-friendly. Identical UI regardless of driver.
+- **Guardrails:** scope to studio topics; rate-limit the route per IP/session (Laravel
+  RateLimiter) to protect the free quota; cap message length and conversation turns;
+  daily request ceiling so free-tier limits are never blown by a bot/scraper.
+- **Privacy:** if running on a free tier whose provider may train on inputs, state briefly
+  in the widget/privacy page that conversations are processed by a third-party AI provider.
+  Never send customer-confidential data through a free tier.
+
+### 2.2 Phases
+
+- **C0 — Refactor to drivers (do this first; C1 already exists as Claude-only):**
+  extract the existing Claude API call behind a `ChatDriver` contract, add `CHAT_DRIVER`
+  env switching, add `GeminiDriver`, keep `ClaudeDriver` working. Test both via curl. STOP.
+- **C0b — Rule-based fallback driver:** `RuleBasedDriver` answering from `faqs`/`services`
+  with keyword/full-text matching + WhatsApp handoff; wire it as the automatic fallback on
+  driver error/429/missing key. Test by unsetting the API key. STOP.
+- **C2 — Chat UI:** bubble → full streaming chat panel, brand styling, mobile layout.
+  Must work identically on any driver. STOP.
+- **C3 — Handoff + logging:** intent-based handoff to WhatsApp/booking/contact,
+  `chat_sessions` table + Filament resource, quota/error visibility in admin, logging
+  disclosure in the widget. STOP.
+
+*(If budget is zero and you want to ship sooner: run C0b + C2 + C3 only, with
+`CHAT_DRIVER=rules`. The widget works, costs nothing, and upgrading later is one env
+variable.)*
 
 ## 3. Feature B — Subscription apps platform
 
@@ -104,12 +141,23 @@ margins, profit) — ideal first candidate: pure logic, no heavy infra.
 ## 4. Sequencing
 
 1. Launch the marketing site (DEPLOYMENT.md) — live and indexed first.
-2. Chatbot (C1–C3) — fastest win, immediate sales asset.
+2. Chatbot (C0 → C0b → C2 → C3) — fastest win, immediate sales asset. Runs free on
+   Gemini's free tier (or fully free rule-based), upgradeable to a paid model later by
+   changing one env variable.
 3. Apps platform (S1–S6) — bigger lift; validate with the calculator before more apps.
+   NOTE: Stripe subscriptions (S4+) require a real budget/merchant setup — that's the
+   phase where paid infrastructure genuinely starts.
 
 ## 5. New env vars / accounts (when these start)
 
-- `ANTHROPIC_API_KEY` — Claude API (chatbot)
+Chatbot (only the key for the active driver is required):
+- `CHAT_DRIVER` — `gemini` | `claude` | `openai` | `rules`
+- `GEMINI_API_KEY` — Google AI Studio (free tier; no card required)
+- `ANTHROPIC_API_KEY` — Claude API (paid; already set up)
+- `OPENAI_API_KEY` — optional alternative (paid; NOT covered by ChatGPT Plus)
+- `CHAT_DAILY_LIMIT` — safety ceiling so free-tier quota can't be exhausted by bots
+
+Subscriptions:
 - `STRIPE_KEY`, `STRIPE_SECRET`, `STRIPE_WEBHOOK_SECRET` (Cashier)
 - Stripe account, test mode for all development
 
