@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Contracts\ChatDriver;
 use App\Http\Controllers\Controller;
+use App\Services\Chat\RuleBasedDriver;
 use App\Services\ChatSystemPromptService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ChatController extends Controller
 {
@@ -15,26 +17,48 @@ class ChatController extends Controller
             'message' => ['required', 'string', 'max:500'],
         ]);
 
-        if (! $driver->isConfigured()) {
-            return response()->json([
-                'error' => 'The chat assistant is not yet available. Please contact us directly.',
-            ], 503);
-        }
-
         $messages = [['role' => 'user', 'content' => trim($request->input('message'))]];
         $system   = $promptService->get();
 
-        return response()->stream(function () use ($driver, $messages, $system) {
+        // RuleBasedDriver is always the fallback; skip it if the primary IS already rule-based.
+        $fallback = ($driver instanceof RuleBasedDriver) ? null : new RuleBasedDriver();
+        $primary  = $driver->isConfigured() ? $driver : null;
+
+        return response()->stream(function () use ($primary, $fallback, $messages, $system) {
             while (ob_get_level() > 0) {
                 ob_end_clean();
             }
 
-            try {
-                foreach ($driver->stream($messages, $system) as $chunk) {
-                    echo 'data: ' . json_encode(['text' => $chunk]) . "\n\n";
+            if ($primary !== null) {
+                try {
+                    foreach ($primary->stream($messages, $system) as $chunk) {
+                        echo 'data: ' . json_encode(['text' => $chunk]) . "\n\n";
+                        flush();
+                    }
+                    echo "data: [DONE]\n\n";
+                    flush();
+                    return;
+                } catch (\Throwable $e) {
+                    Log::warning('ChatDriver failed, falling back to RuleBasedDriver', [
+                        'driver' => class_basename($primary),
+                        'error'  => $e->getMessage(),
+                    ]);
+                }
+            }
+
+            // Fallback (no primary key, primary error, or primary is RuleBasedDriver itself)
+            if ($fallback !== null) {
+                try {
+                    foreach ($fallback->stream($messages, $system) as $chunk) {
+                        echo 'data: ' . json_encode(['text' => $chunk]) . "\n\n";
+                        flush();
+                    }
+                } catch (\Throwable) {
+                    echo 'data: ' . json_encode(['error' => 'The assistant is temporarily unavailable. Please try again.']) . "\n\n";
                     flush();
                 }
-            } catch (\Throwable) {
+            } else {
+                // Primary is RuleBasedDriver and it failed — last resort
                 echo 'data: ' . json_encode(['error' => 'The assistant is temporarily unavailable. Please try again.']) . "\n\n";
                 flush();
             }

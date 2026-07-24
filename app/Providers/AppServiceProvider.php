@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Contracts\ChatDriver;
 use App\Services\Chat\ClaudeDriver;
 use App\Services\Chat\GeminiDriver;
+use App\Services\Chat\RuleBasedDriver;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -18,6 +19,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ChatDriver::class, function () {
             return match (config('chat.driver', 'gemini')) {
                 'claude' => new ClaudeDriver(),
+                'rules'  => new RuleBasedDriver(),
                 default  => new GeminiDriver(),
             };
         });
