@@ -1,5 +1,5 @@
 {{--
-    AI chatbot bubble + streaming chat panel (Phase C2).
+    AI chatbot bubble + streaming chat panel (Phase C2/C3).
     All state managed by Alpine. Works identically on any ChatDriver (Gemini / Claude / RuleBasedDriver).
 --}}
 <div x-data="chatbot()" class="fixed bottom-6 right-4 sm:right-6 z-50">
@@ -64,19 +64,70 @@
                     class="flex flex-col"
                     :class="msg.role === 'user' ? 'items-end' : 'items-start'"
                 >
-                    <div
-                        class="px-3.5 py-2.5 text-sm leading-relaxed break-words max-w-[85%]"
-                        :class="msg.role === 'user'
-                            ? 'text-white rounded-2xl rounded-br-sm'
-                            : 'bg-surface border border-border text-text-body rounded-2xl rounded-bl-sm'"
-                        :style="msg.role === 'user' ? 'background: var(--gradient-brand)' : ''"
-                    >
-                        <span x-text="msg.text"></span><span
-                            x-show="msg.streaming"
-                            class="chat-cursor"
-                            aria-hidden="true"
-                        ></span>
-                    </div>
+                    {{-- Standard user / bot bubble --}}
+                    <template x-if="msg.role !== 'handoff'">
+                        <div
+                            class="px-3.5 py-2.5 text-sm leading-relaxed break-words max-w-[85%]"
+                            :class="msg.role === 'user'
+                                ? 'text-white rounded-2xl rounded-br-sm'
+                                : 'bg-surface border border-border text-text-body rounded-2xl rounded-bl-sm'"
+                            :style="msg.role === 'user' ? 'background: var(--gradient-brand)' : ''"
+                        >
+                            <span x-text="msg.text"></span><span
+                                x-show="msg.streaming"
+                                class="chat-cursor"
+                                aria-hidden="true"
+                            ></span>
+                        </div>
+                    </template>
+
+                    {{-- Handoff CTA card --}}
+                    <template x-if="msg.role === 'handoff'">
+                        <div class="w-full max-w-[92%] rounded-2xl border border-border bg-surface p-3 text-sm">
+                            <p class="mb-2 font-semibold text-indigo-ink" style="font-family: var(--font-heading);">
+                                Talk to a real person
+                            </p>
+                            <div class="flex flex-col gap-2">
+                                <template x-if="msg.whatsapp_url">
+                                    <a
+                                        :href="msg.whatsapp_url"
+                                        target="_blank"
+                                        rel="noopener"
+                                        class="flex items-center gap-2 rounded-xl px-3 py-2 text-white text-xs font-medium hover:brightness-110 transition-all duration-150"
+                                        style="background: var(--gradient-brand)"
+                                    >
+                                        <svg class="w-4 h-4 flex-none" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                                            <path d="M12 0C5.373 0 0 5.373 0 12c0 2.119.553 4.107 1.523 5.832L.057 23.568a.5.5 0 0 0 .609.61l5.79-1.479A11.951 11.951 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.954 9.954 0 0 1-5.031-1.36l-.361-.214-3.737.955.983-3.642-.235-.374A9.954 9.954 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+                                        </svg>
+                                        Chat on WhatsApp
+                                    </a>
+                                </template>
+                                <template x-if="msg.booking_url">
+                                    <a
+                                        :href="msg.booking_url"
+                                        target="_blank"
+                                        rel="noopener"
+                                        class="flex items-center gap-2 rounded-xl border border-violet px-3 py-2 text-violet text-xs font-medium hover:bg-violet hover:text-white transition-all duration-150"
+                                    >
+                                        <svg class="w-4 h-4 flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                            <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+                                        </svg>
+                                        Book a call
+                                    </a>
+                                </template>
+                                <a
+                                    href="/contact"
+                                    class="flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-text-muted text-xs font-medium hover:border-violet hover:text-violet transition-all duration-150"
+                                >
+                                    <svg class="w-4 h-4 flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                        <path stroke-linecap="round" d="M21 8V5a2 2 0 00-2-2H5a2 2 0 00-2 2v3M21 8H3m18 0l-9 7-9-7"/>
+                                    </svg>
+                                    Contact form
+                                </a>
+                            </div>
+                        </div>
+                    </template>
                 </div>
             </template>
         </div>
@@ -111,6 +162,7 @@
             <p class="text-[10px] text-text-muted mt-1.5 text-center leading-tight">
                 AI may make mistakes ·
                 <a href="/contact" class="hover:text-violet underline underline-offset-2 transition-colors duration-150">Contact us directly</a>
+                · <span title="Conversations are processed by a third-party AI provider">Processed by AI</span>
             </p>
         </div>
     </div>
@@ -152,6 +204,9 @@ document.addEventListener('alpine:init', () => {
         input:     '',
         sending:   false,
         hasUnread: false,
+        sessionId: (typeof crypto !== 'undefined' && crypto.randomUUID)
+            ? crypto.randomUUID()
+            : Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2),
 
         toggle() {
             this.open ? this.close() : this.openPanel();
@@ -197,8 +252,9 @@ document.addEventListener('alpine:init', () => {
                 const response = await fetch('/api/chat', {
                     method:  'POST',
                     headers: {
-                        'Content-Type':     'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type':       'application/json',
+                        'X-Requested-With':   'XMLHttpRequest',
+                        'X-Chat-Session-Id':  this.sessionId,
                     },
                     body: JSON.stringify({ message: text }),
                 });
@@ -237,6 +293,19 @@ document.addEventListener('alpine:init', () => {
                                 if (bot) bot.text += event.text;
                                 if (!this.open) this.hasUnread = true;
                                 this.$nextTick(() => this.scrollToBottom());
+                            } else if (event.handoff) {
+                                // Stop the streaming cursor on the last bot message
+                                const bot = this.lastBotMessage();
+                                if (bot) bot.streaming = false;
+                                // Push a handoff card
+                                this.messages.push({
+                                    role:         'handoff',
+                                    whatsapp_url: event.handoff.whatsapp_url || null,
+                                    booking_url:  event.handoff.booking_url  || null,
+                                    contact_url:  event.handoff.contact_url  || '/contact',
+                                });
+                                if (!this.open) this.hasUnread = true;
+                                this.$nextTick(() => this.scrollToBottom());
                             } else if (event.error) {
                                 this.setLastBotText(event.error);
                                 break outer;
@@ -246,7 +315,7 @@ document.addEventListener('alpine:init', () => {
                 }
 
                 const bot = this.lastBotMessage();
-                if (bot) bot.streaming = false;
+                if (bot && bot.role === 'bot') bot.streaming = false;
 
             } catch (_) {
                 this.setLastBotText('Something went wrong. Please check your connection and try again.');
@@ -258,7 +327,7 @@ document.addEventListener('alpine:init', () => {
 
         setLastBotText(text) {
             const bot = this.lastBotMessage();
-            if (bot) { bot.text = text; bot.streaming = false; }
+            if (bot && bot.role === 'bot') { bot.text = text; bot.streaming = false; }
         },
 
         lastBotMessage() {
