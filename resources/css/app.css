@@ -138,6 +138,19 @@
     animation-play-state: paused;
 }
 
+/* ─── Chat streaming cursor (Phase C2) ──────────────────────────────────────── */
+@keyframes chatCursor {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0; }
+}
+.chat-cursor::after {
+    content: '▋';
+    display: inline-block;
+    margin-left: 1px;
+    color: var(--color-violet);
+    animation: chatCursor 700ms ease-in-out infinite;
+}
+
 /* ─── Reduced-motion kill switch ─────────────────────────────────────────────── */
 /* Covers every animation sitewide — single place to maintain */
 @media (prefers-reduced-motion: reduce) {
