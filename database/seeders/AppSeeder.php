@@ -24,7 +24,7 @@ class AppSeeder extends Seeder
                     ['label' => 'Multi-marketplace fee comparison',    'tier' => 'pro'],
                     ['label' => 'Export to Excel / PDF',               'tier' => 'pro'],
                 ],
-                'status'      => 'coming_soon',
+                'status'      => 'live',
                 'sort_order'  => 1,
             ]
         );

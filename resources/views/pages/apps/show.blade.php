@@ -57,7 +57,7 @@
 
                     <div class="mt-8 flex flex-wrap items-center gap-4">
                         @if($isLive)
-                            <x-button-primary href="{{ route('apps.show', $app) }}/use">
+                            <x-button-primary href="{{ route('apps.use', $app) }}">
                                 Try it free
                             </x-button-primary>
                         @else
@@ -221,7 +221,7 @@
                     </h2>
                     <p class="mt-4 text-text-muted leading-relaxed">Free features are open to everyone. Create an account to get started.</p>
                     <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
-                        <x-button-primary href="{{ route('apps.show', $app) }}/use">Try it free</x-button-primary>
+                        <x-button-primary href="{{ route('apps.use', $app) }}">Try it free</x-button-primary>
                         <x-button-secondary href="{{ route('customer.register') }}">Create account</x-button-secondary>
                     </div>
                 @else

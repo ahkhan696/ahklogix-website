@@ -40,8 +40,9 @@ Route::get('/contact',  [ContactController::class, 'show'])->name('contact');
 Route::post('/contact', [ContactController::class, 'submit'])->middleware('throttle:5,1')->name('contact.submit');
 
 // Apps
-Route::get('/apps',        [AppController::class, 'index'])->name('apps.index');
-Route::get('/apps/{app}',  [AppController::class, 'show'])->name('apps.show');
+Route::get('/apps',            [AppController::class, 'index'])->name('apps.index');
+Route::get('/apps/{app}/use',  [AppController::class, 'run'])->name('apps.use');
+Route::get('/apps/{app}',      [AppController::class, 'show'])->name('apps.show');
 
 // Sitemap
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');

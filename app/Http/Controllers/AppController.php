@@ -20,4 +20,12 @@ class AppController extends Controller
     {
         return view('pages.apps.show', compact('app'));
     }
+
+    public function run(AppModel $app): View
+    {
+        abort_unless($app->status === 'live', 404);
+
+        $viewSlug = str_replace('-', '_', $app->slug);
+        return view("pages.apps.use.{$viewSlug}", compact('app'));
+    }
 }
