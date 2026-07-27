@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Contracts\ChatDriver;
+use App\Models\Customer;
 use App\Services\Chat\ClaudeDriver;
 use App\Services\Chat\GeminiDriver;
 use App\Services\Chat\RuleBasedDriver;
@@ -11,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Cashier\Cashier;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,6 +29,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        Cashier::useCustomerModel(Customer::class);
+
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
         }
