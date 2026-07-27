@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AboutController;
+use App\Http\Controllers\AppController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\FaqController;
@@ -37,6 +38,10 @@ Route::get('/faq',   FaqController::class)->name('faq');
 // Contact
 Route::get('/contact',  [ContactController::class, 'show'])->name('contact');
 Route::post('/contact', [ContactController::class, 'submit'])->middleware('throttle:5,1')->name('contact.submit');
+
+// Apps
+Route::get('/apps',        [AppController::class, 'index'])->name('apps.index');
+Route::get('/apps/{app}',  [AppController::class, 'show'])->name('apps.show');
 
 // Sitemap
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');

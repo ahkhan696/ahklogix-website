@@ -23,6 +23,7 @@
                 $navLinks = [
                     ['label' => 'Services',  'route' => 'services.index',   'match' => 'services*'],
                     ['label' => 'Portfolio', 'route' => 'portfolio.index',  'match' => 'portfolio*'],
+                    ['label' => 'Apps',      'route' => 'apps.index',       'match' => 'apps*'],
                     ['label' => 'POSR',      'route' => 'posr',             'match' => 'posr'],
                     ['label' => 'Blog',      'route' => 'blog.index',       'match' => 'blog*'],
                     ['label' => 'About',     'route' => 'about',            'match' => 'about'],
