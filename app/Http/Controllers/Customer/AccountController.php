@@ -19,25 +19,36 @@ class AccountController extends Controller
         $isSubscribed = $this->gateway->isSubscribed($customer);
         $subscription = $customer->subscription('default');
 
-        $monthlyPriceId = Setting::get('paddle_price_monthly');
-        $yearlyPriceId  = Setting::get('paddle_price_yearly');
+        $billingEnabled  = config('billing.enabled', true);
+        $checkoutMonthly = null;
+        $checkoutYearly  = null;
 
-        $checkoutMonthly = (! $isSubscribed && $monthlyPriceId)
-            ? $this->gateway->buildCheckout($customer, $monthlyPriceId)
-            : null;
+        if ($billingEnabled && ! $isSubscribed) {
+            $monthlyPriceId = Setting::get('paddle_price_monthly');
+            $yearlyPriceId  = Setting::get('paddle_price_yearly');
 
-        $checkoutYearly = (! $isSubscribed && $yearlyPriceId)
-            ? $this->gateway->buildCheckout($customer, $yearlyPriceId)
-            : null;
+            if ($monthlyPriceId) {
+                $checkoutMonthly = $this->gateway->buildCheckout($customer, $monthlyPriceId);
+            }
+
+            if ($yearlyPriceId) {
+                $checkoutYearly = $this->gateway->buildCheckout($customer, $yearlyPriceId);
+            }
+        }
 
         return view('customer.account.index', compact(
             'customer', 'isSubscribed', 'subscription',
-            'checkoutMonthly', 'checkoutYearly'
+            'billingEnabled', 'checkoutMonthly', 'checkoutYearly'
         ));
     }
 
     public function billingPortal(): RedirectResponse
     {
+        if (! config('billing.enabled', true)) {
+            return redirect()->route('customer.account')
+                ->with('error', 'Billing is not yet active.');
+        }
+
         $customer = Auth::guard('customer')->user();
         $url      = $this->gateway->billingPortalUrl($customer);
 

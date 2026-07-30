@@ -21,6 +21,10 @@
                         </svg>
                         Pro
                     </span>
+                @elseif(! $billingEnabled)
+                    <span class="inline-flex items-center gap-1.5 rounded-full border border-violet/30 bg-violet/5 px-3 py-1 text-xs font-semibold text-violet">
+                        Free during beta
+                    </span>
                 @else
                     <span class="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1 text-xs font-semibold text-text-muted">
                         <span class="w-1.5 h-1.5 rounded-full bg-text-muted inline-block"></span>
@@ -88,7 +92,32 @@
         <div>
             <h2 class="text-lg font-semibold text-indigo-ink mb-1" style="font-family: var(--font-heading);">Billing</h2>
 
-            @if($isSubscribed)
+            @if(! $billingEnabled)
+                {{-- ── Beta mode — billing not yet active ───────────────────── --}}
+                <p class="text-sm text-text-muted mb-6">All features are free during the beta period.</p>
+                <div class="rounded-2xl border border-violet/20 bg-bg p-6 relative overflow-hidden">
+                    <div class="absolute inset-x-0 top-0 h-0.5" style="background: var(--gradient-brand)" aria-hidden="true"></div>
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="inline-flex items-center rounded-full border border-violet/30 bg-violet/5 px-2.5 py-0.5 text-xs font-semibold text-violet">Free during beta</span>
+                                <span class="text-sm font-semibold text-indigo-ink">All pro features unlocked</span>
+                            </div>
+                            <p class="text-xs text-text-muted">Billing will activate when the platform is ready. No card required now.</p>
+                        </div>
+                        <a
+                            href="{{ route('apps.index') }}"
+                            class="inline-flex items-center gap-2 rounded-xl border border-border px-4 py-2 text-sm font-medium text-text-muted hover:border-violet hover:text-violet transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet"
+                        >
+                            Browse apps
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+            @elseif($isSubscribed)
                 {{-- ── Active subscriber ─────────────────────────────────── --}}
                 <p class="text-sm text-text-muted mb-6">Your current plan and billing details.</p>
                 <div class="rounded-2xl border border-violet/20 bg-bg p-6 relative overflow-hidden">
@@ -143,7 +172,7 @@
                             </li>
                             <li class="flex items-center gap-2 text-sm text-text-body">
                                 <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M19.916 4.626a.75.75 0 0 1 .208 1.04l-9 13.5a.75.75 0 0 1-1.154.114l-6-6a.75.75 0 0 1 1.06-1.06l5.353 5.353 8.493-12.74a.75.75 0 0 1 1.04-.207Z" clip-rule="evenodd"/></svg>
-                                Export to Excel / PDF
+                                Export to CSV / PDF
                             </li>
                         </ul>
                         @if($checkoutMonthly)
@@ -207,7 +236,9 @@
     </x-container>
 </section>
 
-{{-- Paddle.js — loaded only on this page, after content --}}
-@paddleJS
+{{-- Paddle.js — only loaded when billing is active --}}
+@if($billingEnabled)
+    @paddleJS
+@endif
 
 </x-layouts.app>
