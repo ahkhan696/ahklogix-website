@@ -42,18 +42,23 @@ class PricingCalculator extends Component
 
     private function resolveProAccess(): bool
     {
-        if (! config('billing.enabled', true)) {
-            return true;
-        }
+        try {
+            if (! config('billing.enabled', true)) {
+                return true;
+            }
 
-        /** @var Customer|null $customer */
-        $customer = auth('customer')->user();
+            /** @var Customer|null $customer */
+            $customer = auth('customer')->user();
 
-        if (! $customer) {
+            if (! $customer) {
+                return false;
+            }
+
+            return app(SubscriptionGateway::class)->isSubscribed($customer);
+        } catch (\Throwable $e) {
+            logger()->error('SubscriptionGateway::isSubscribed failed', ['error' => $e->getMessage()]);
             return false;
         }
-
-        return app(SubscriptionGateway::class)->isSubscribed($customer);
     }
 
     private function authorizePro(): bool
@@ -137,14 +142,20 @@ class PricingCalculator extends Component
 
         $name = trim($this->scenarioName) ?: 'Scenario ' . now()->format('M j, H:i');
 
-        CalculatorScenario::create([
-            'customer_id' => $customer->id,
-            'name'        => $name,
-            'platform'    => $this->platform,
-            'fee_percent' => (float) $this->feePercent,
-            'flat_fee'    => (float) $this->flatFee,
-            'products'    => $this->products,
-        ]);
+        try {
+            CalculatorScenario::create([
+                'customer_id' => $customer->id,
+                'name'        => $name,
+                'platform'    => $this->platform,
+                'fee_percent' => (float) $this->feePercent,
+                'flat_fee'    => (float) $this->flatFee,
+                'products'    => $this->products,
+            ]);
+        } catch (\Throwable $e) {
+            logger()->error('Failed to save calculator scenario', ['error' => $e->getMessage()]);
+            $this->dispatch('scenario-error');
+            return;
+        }
 
         $this->scenarioName = '';
         unset($this->scenarios);

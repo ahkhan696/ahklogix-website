@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\App as AppModel;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class AppController extends Controller
@@ -24,6 +25,8 @@ class AppController extends Controller
     public function run(AppModel $app): View
     {
         abort_unless($app->status === 'live', 404);
+
+        DB::table('apps')->where('id', $app->id)->increment('usage_count');
 
         $viewSlug = str_replace('-', '_', $app->slug);
         return view("pages.apps.use.{$viewSlug}", compact('app'));

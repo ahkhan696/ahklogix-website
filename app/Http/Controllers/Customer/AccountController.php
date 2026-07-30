@@ -28,11 +28,19 @@ class AccountController extends Controller
             $yearlyPriceId  = Setting::get('paddle_price_yearly');
 
             if ($monthlyPriceId) {
-                $checkoutMonthly = $this->gateway->buildCheckout($customer, $monthlyPriceId);
+                try {
+                    $checkoutMonthly = $this->gateway->buildCheckout($customer, $monthlyPriceId);
+                } catch (\Throwable $e) {
+                    logger()->error('Paddle checkout (monthly) failed', ['error' => $e->getMessage()]);
+                }
             }
 
             if ($yearlyPriceId) {
-                $checkoutYearly = $this->gateway->buildCheckout($customer, $yearlyPriceId);
+                try {
+                    $checkoutYearly = $this->gateway->buildCheckout($customer, $yearlyPriceId);
+                } catch (\Throwable $e) {
+                    logger()->error('Paddle checkout (yearly) failed', ['error' => $e->getMessage()]);
+                }
             }
         }
 

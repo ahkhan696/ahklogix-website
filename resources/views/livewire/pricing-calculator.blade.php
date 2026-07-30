@@ -4,9 +4,11 @@
         showUpgradeModal: false,
         showScenarioSave: false,
         scenarioSaved: null,
+        scenarioError: false,
     }"
     @pro-required.window="showUpgradeModal = true"
     @scenario-saved.window="(e) => { scenarioSaved = e.detail.name; setTimeout(() => scenarioSaved = null, 3000); }"
+    @scenario-error.window="scenarioError = true; setTimeout(() => scenarioError = false, 3000)"
 >
 
 {{-- ── Pro upgrade modal ────────────────────────────────────────────────────── --}}
@@ -480,6 +482,16 @@
         style="display: none"
     >
         <p class="text-xs font-medium text-emerald-700">Saved "<span x-text="scenarioSaved"></span>"</p>
+    </div>
+
+    {{-- Save error toast --}}
+    <div
+        x-show="scenarioError"
+        x-transition.opacity
+        class="border-b border-red-100 bg-red-50 px-6 py-3"
+        style="display: none"
+    >
+        <p class="text-xs font-medium text-red-700">Failed to save — please try again.</p>
     </div>
 
     {{-- Scenario list --}}

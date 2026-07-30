@@ -103,6 +103,10 @@ class AppResource extends Resource
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn ($state) => $state === 'live' ? 'success' : 'gray'),
+                Tables\Columns\TextColumn::make('usage_count')
+                    ->label('Opens')
+                    ->numeric()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')->since()->sortable(),
             ])
             ->defaultSort('sort_order')
