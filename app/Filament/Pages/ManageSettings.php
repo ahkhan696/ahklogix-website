@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Models\Setting;
 use Filament\Actions\Action;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -27,7 +28,11 @@ class ManageSettings extends Page implements HasForms
 
     public function mount(): void
     {
-        $keys = ['whatsapp_number', 'booking_url', 'contact_email', 'chatbot_embed', 'linkedin_url', 'twitter_url', 'github_url', 'ghl_webhook_url'];
+        $keys = [
+            'whatsapp_number', 'booking_url', 'contact_email', 'chatbot_embed',
+            'linkedin_url', 'twitter_url', 'github_url', 'ghl_webhook_url',
+            'payment_provider', 'paddle_price_monthly', 'paddle_price_yearly',
+        ];
         $values = Setting::whereIn('key', $keys)->pluck('value', 'key')->toArray();
 
         $this->form->fill($values);
@@ -71,6 +76,25 @@ class ManageSettings extends Page implements HasForms
                         ->rows(5)
                         ->helperText('Paste the full embed script from your chatbot provider. Leave empty to show the placeholder bubble.'),
                 ]),
+
+                Section::make('Payment provider')->schema([
+                    Select::make('payment_provider')
+                        ->label('Active payment driver')
+                        ->options([
+                            'paddle' => 'Paddle (active)',
+                            'stripe' => 'Stripe (future — requires foreign entity)',
+                        ])
+                        ->default('paddle'),
+                    TextInput::make('paddle_price_monthly')
+                        ->label('Paddle monthly price ID')
+                        ->placeholder('pri_01xxxxxxxxxxxxxxxxxxxxxx')
+                        ->helperText('Public price ID from your Paddle dashboard. Starts with pri_.'),
+                    TextInput::make('paddle_price_yearly')
+                        ->label('Paddle yearly price ID')
+                        ->placeholder('pri_01xxxxxxxxxxxxxxxxxxxxxx')
+                        ->helperText('Public price ID from your Paddle dashboard. Starts with pri_.'),
+                ])->columns(2)
+                 ->description('API keys and webhook secrets must stay in server .env only — never enter them here.'),
             ])
             ->statePath('data');
     }

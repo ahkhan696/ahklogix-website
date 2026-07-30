@@ -2,53 +2,50 @@
 
 namespace App\Http\Controllers\Customer;
 
+use App\Contracts\SubscriptionGateway;
 use App\Http\Controllers\Controller;
+use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class AccountController extends Controller
 {
+    public function __construct(private SubscriptionGateway $gateway) {}
+
     public function index(): View
     {
         $customer     = Auth::guard('customer')->user();
-        $isSubscribed = $customer->subscribed('pro');
-        $subscription = $isSubscribed ? $customer->subscription('pro') : null;
+        $isSubscribed = $this->gateway->isSubscribed($customer);
+        $subscription = $customer->subscription('default');
 
-        return view('customer.account.index', compact('customer', 'isSubscribed', 'subscription'));
-    }
+        $monthlyPriceId = Setting::get('paddle_price_monthly');
+        $yearlyPriceId  = Setting::get('paddle_price_yearly');
 
-    public function checkout(string $price): RedirectResponse
-    {
-        $allowed = array_filter([
-            config('services.stripe.price_monthly'),
-            config('services.stripe.price_yearly'),
-        ]);
+        $checkoutMonthly = (! $isSubscribed && $monthlyPriceId)
+            ? $this->gateway->buildCheckout($customer, $monthlyPriceId)
+            : null;
 
-        abort_unless(in_array($price, $allowed, true), 422);
+        $checkoutYearly = (! $isSubscribed && $yearlyPriceId)
+            ? $this->gateway->buildCheckout($customer, $yearlyPriceId)
+            : null;
 
-        $customer = Auth::guard('customer')->user();
-
-        if ($customer->subscribed('pro')) {
-            return $this->billingPortal();
-        }
-
-        $checkout = $customer
-            ->newSubscription('pro', $price)
-            ->checkout([
-                'success_url' => route('customer.account') . '?checkout=success',
-                'cancel_url'  => route('customer.account'),
-            ]);
-
-        return redirect($checkout->url);
+        return view('customer.account.index', compact(
+            'customer', 'isSubscribed', 'subscription',
+            'checkoutMonthly', 'checkoutYearly'
+        ));
     }
 
     public function billingPortal(): RedirectResponse
     {
         $customer = Auth::guard('customer')->user();
+        $url      = $this->gateway->billingPortalUrl($customer);
 
-        return redirect(
-            $customer->billingPortalUrl(route('customer.account'))
-        );
+        if (! $url) {
+            return redirect()->route('customer.account')
+                ->with('error', 'Unable to open billing portal. Please try again later.');
+        }
+
+        return redirect($url);
     }
 }

@@ -35,13 +35,19 @@ return [
         ],
     ],
 
-    // ── Stripe (Cashier) ─────────────────────────────────────────────────────
+    // ── Paddle (active payment driver) ───────────────────────────────────────
+    // Secret keys (PADDLE_API_KEY, PADDLE_WEBHOOK_SECRET) live in .env and
+    // cashier.php only — never stored in DB or admin UI.
+    // Public price IDs are stored in the settings table (editable via admin).
+    'paddle' => [
+        'client_side_token' => env('PADDLE_CLIENT_SIDE_TOKEN'),
+    ],
+
+    // ── Stripe (future driver — not supported in Pakistan until foreign entity) ─
     'stripe' => [
         'key'            => env('STRIPE_KEY'),
         'secret'         => env('STRIPE_SECRET'),
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
-        'price_monthly'  => env('STRIPE_PRICE_MONTHLY'),
-        'price_yearly'   => env('STRIPE_PRICE_YEARLY'),
     ],
 
     // ── AI chat drivers ───────────────────────────────────────────────────────

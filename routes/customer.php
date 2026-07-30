@@ -16,9 +16,8 @@ Route::middleware('guest:customer')->group(function () {
 
 // ── Authenticated customer routes ─────────────────────────────────────────────
 Route::middleware('auth.customer:customer')->group(function () {
-    Route::get('/account',  [AccountController::class, 'index'])->name('customer.account');
-    Route::post('/account/checkout/{price}', [AccountController::class, 'checkout'])->name('customer.checkout');
-    Route::post('/account/billing-portal',   [AccountController::class, 'billingPortal'])->name('customer.billing-portal');
+    Route::get('/account',               [AccountController::class, 'index'])->name('customer.account');
+    Route::post('/account/billing-portal', [AccountController::class, 'billingPortal'])->name('customer.billing-portal');
 });
 
 // ── Logout (any authenticated state) ─────────────────────────────────────────

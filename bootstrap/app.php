@@ -22,7 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth.customer' => \App\Http\Middleware\AuthenticateCustomer::class,
         ]);
         $middleware->validateCsrfTokens(except: [
-            'stripe/webhook',
+            'paddle/webhook',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

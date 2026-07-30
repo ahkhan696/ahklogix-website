@@ -49,7 +49,17 @@
             <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clip-rule="evenodd"/>
             </svg>
-            <p class="text-sm font-medium text-emerald-800">You're now on the Pro plan. Welcome aboard!</p>
+            <p class="text-sm font-medium text-emerald-800">Payment received — your Pro plan will activate shortly. Refresh in a moment if you don't see it yet.</p>
+        </div>
+    </x-container>
+</div>
+@endif
+
+@if(session('error'))
+<div class="bg-red-50 border-b border-red-200" role="alert">
+    <x-container>
+        <div class="flex items-center gap-3 py-3">
+            <p class="text-sm font-medium text-red-800">{{ session('error') }}</p>
         </div>
     </x-container>
 </div>
@@ -91,18 +101,8 @@
                             </div>
                             @if($subscription && $subscription->ends_at)
                                 <p class="text-xs text-text-muted">Cancels on {{ $subscription->ends_at->format('M j, Y') }}</p>
-                            @elseif($subscription)
-                                <p class="text-xs text-text-muted">
-                                    Renews on
-                                    @php
-                                        try {
-                                            $stripeSubscription = $subscription->asStripeSubscription();
-                                            echo \Carbon\Carbon::createFromTimestamp($stripeSubscription->current_period_end)->format('M j, Y');
-                                        } catch (\Throwable) {
-                                            echo '—';
-                                        }
-                                    @endphp
-                                </p>
+                            @elseif($subscription && $subscription->status === 'active')
+                                <p class="text-xs text-text-muted">Active</p>
                             @endif
                         </div>
                         <form method="POST" action="{{ route('customer.billing-portal') }}">
@@ -146,17 +146,14 @@
                                 Export to Excel / PDF
                             </li>
                         </ul>
-                        @if(config('services.stripe.price_monthly'))
-                            <form method="POST" action="{{ route('customer.checkout', config('services.stripe.price_monthly')) }}">
-                                @csrf
-                                <button
-                                    type="submit"
-                                    class="w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet"
-                                    style="background: var(--gradient-brand)"
-                                >
-                                    Upgrade — $9/mo
-                                </button>
-                            </form>
+                        @if($checkoutMonthly)
+                            <x-paddle-button
+                                :checkout="$checkoutMonthly"
+                                class="w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet"
+                                style="background: var(--gradient-brand)"
+                            >
+                                Upgrade — $9/mo
+                            </x-paddle-button>
                         @else
                             <button disabled class="w-full inline-flex items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold text-white opacity-40 cursor-not-allowed" style="background: var(--gradient-brand)">
                                 Coming soon
@@ -189,17 +186,14 @@
                                 Priority support
                             </li>
                         </ul>
-                        @if(config('services.stripe.price_yearly'))
-                            <form method="POST" action="{{ route('customer.checkout', config('services.stripe.price_yearly')) }}">
-                                @csrf
-                                <button
-                                    type="submit"
-                                    class="w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet"
-                                    style="background: var(--gradient-brand)"
-                                >
-                                    Upgrade — $79/yr
-                                </button>
-                            </form>
+                        @if($checkoutYearly)
+                            <x-paddle-button
+                                :checkout="$checkoutYearly"
+                                class="w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet"
+                                style="background: var(--gradient-brand)"
+                            >
+                                Upgrade — $79/yr
+                            </x-paddle-button>
                         @else
                             <button disabled class="w-full inline-flex items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold text-white opacity-40 cursor-not-allowed" style="background: var(--gradient-brand)">
                                 Coming soon
@@ -212,5 +206,8 @@
 
     </x-container>
 </section>
+
+{{-- Paddle.js — loaded only on this page, after content --}}
+@paddleJS
 
 </x-layouts.app>
